@@ -23,7 +23,7 @@ app.post('/signup', (request, response) => {
   const userExists = users.some(user => user.email === email);
 
   if (userExists) {
-    return response.status(400).send({ error: 'Esse usuário já existe' });
+    return response.status(400).send({ error: 'Esse usuário/email já está cadastrado' });
   }
 
   const user = { id: users.length + 1, name, email, password };
