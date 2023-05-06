@@ -74,5 +74,22 @@ app.post('/login', (request, response) => {
   app.get('/notes', (request, response) => {
     return response.json(notes);
   });
+
+  //Rota Para Visualizar Um Recado Especifico
+
+  app.get('/notes/:id', (request, response) => {
+    const { id } = request.params;
+  
+    const note = notes.find(note => note.id === parseInt(id));
+  
+    if (!note) {
+      return response.status(404).send({ error: 'Recado não encontrado.' });
+    }
+  
+    return response.json(note);
+  });
+  
+  //Rota Para Atualizar Um Recado Especifico
+
   
   
