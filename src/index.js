@@ -11,6 +11,8 @@ app.listen(8080, () => console.log("Servidor iniciado"));
 
 const users = [];
 
+//Rota de Criação de Conta
+
 app.post('/signup', (request, response) => {
   const { name, email, password } = request.body;
 
@@ -30,6 +32,8 @@ app.post('/signup', (request, response) => {
 
   return response.status(201).send({ user });
 });
+
+//Rota de Login
 
 app.post('/login', (request, response) => {
     const { email, password } = request.body;
