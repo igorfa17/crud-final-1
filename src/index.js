@@ -9,6 +9,8 @@ return response.json('OK');
 });
 app.listen(8080, () => console.log("Servidor iniciado"));
 
+//Array Para Armazenar Usuarios
+
 const users = [];
 
 //Rota de Criação de Conta
@@ -51,3 +53,6 @@ app.post('/login', (request, response) => {
     return response.send({ user });
   });
   
+  //Array Para Armazenar Recados
+  
+  const notes = [];
