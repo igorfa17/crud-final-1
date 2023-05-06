@@ -9,9 +9,10 @@ return response.json('OK');
 });
 app.listen(8080, () => console.log("Servidor iniciado"));
 
-//Array Para Armazenar Usuarios
+//Array Para Armazenar Usuarios e Recados
 
 const users = [];
+const notes = [];
 
 //Rota de Criação de Conta
 
@@ -53,6 +54,25 @@ app.post('/login', (request, response) => {
     return response.send({ user });
   });
   
-  //Array Para Armazenar Recados
+  //Rota Para Criar Recados
+  app.post('/notes', (request, response) => {
+    const { title, description, userId } = request.body;
   
-  const notes = [];
+    if (!title || !description || !userId) {
+      return response.status(400).send({ error: 'Título, descrição e identificador do usuário são obrigatórios' });
+    }
+  
+    const note = { id: notes.length + 1, title, description, userId };
+  
+    notes.push(note);
+  
+    return response.status(201).send({ note });
+  });
+
+  //Rota Para Listar Todos Os Recados
+
+  app.get('/notes', (request, response) => {
+    return response.json(notes);
+  });
+  
+  
