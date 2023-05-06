@@ -23,7 +23,7 @@ app.post('/signup', (request, response) => {
   const userExists = users.some(user => user.email === email);
 
   if (userExists) {
-    return response.status(400).send({ error: 'Esse usuário/email já está cadastrado' });
+    return response.status(400).send({ error: 'Esse usuário / email já está cadastrado' });
   }
 
   const user = { id: users.length + 1, name, email, password };
@@ -32,3 +32,22 @@ app.post('/signup', (request, response) => {
 
   return response.status(201).send({ user });
 });
+
+//Criando rota de login
+
+app.post('/login', (request, response) => {
+    const { email, password } = request.body;
+  
+    if (!email || !password) {
+      return response.status(400).send({ error: 'Email e senha são obrigatórios.' });
+    }
+  
+    const user = users.find(user => user.email === email && user.password === password);
+  
+    if (!user) {
+      return response.status(401).send({ error: 'Email ou senha inválidos.' });
+    }
+  
+    return response.send({ user });
+  });
+  
