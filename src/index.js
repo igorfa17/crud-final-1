@@ -9,47 +9,35 @@ return response.json('OK');
 });
 app.listen(8080, () => console.log("Servidor iniciado"));
 
-//Criando rota de criação de conta
+//Const de rotas
 
-const users = [];
-
-app.post('/signup', (request, response) => {
-  const { name, email, password } = request.body;
-
-  if (!name || !email || !password) {
-    return response.status(400).send({ error: 'Nome, email e senha são obrigatórios' });
+  const db = {
+    users: [],
+    messages: []
   }
 
-  const userExists = users.some(user => user.email === email);
+  //Criação de conta
 
+  app.post('/signup', (req, res) => {
+  const { name, email, password } = req.body;
+
+  // Verifica se já existe um usuário com o mesmo e-mail
+  const userExists = db.users.find(user => user.email === email);
   if (userExists) {
-    return response.status(400).send({ error: 'Esse usuário / email já está cadastrado' });
+    return res.status(400).json({ error: 'E-mail já cadastrado' });
   }
 
-  const user = { id: users.length + 1, name, email, password };
+  // Cria o novo usuário
+  const newUser = {
+    id: db.users.length + 1,
+    name,
+    email,
+    password
+  };
+  db.users.push(newUser);
 
-  users.push(user);
-
-  return response.status(201).send({ user });
+  return res.status(201).json(newUser);
 });
 
-//Criando rota de login
 
-app.post('/login', (request, response) => {
-    const { email, password } = request.body;
-  
-    if (!email || !password) {
-      return response.status(400).send({ error: 'Email e senha são obrigatórios.' });
-    }
-  
-    const user = users.find(user => user.email === email && user.password === password);
-  
-    if (!user) {
-      return response.status(401).send({ error: 'Email ou senha inválidos.' });
-    }
-  
-    return response.send({ user });
-  });
-
-  
   
