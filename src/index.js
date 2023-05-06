@@ -89,7 +89,30 @@ app.post('/login', (request, response) => {
     return response.json(note);
   });
   
-  //Rota Para Atualizar Um Recado Especifico
+  //Rota Para Atualizar E Excluir Um Recado Especifico
 
+  app.put('/notes/:id', (request, response) => {
+    const { title, description } = request.body;
+    const userId = request.headers.authorization;
+    const noteId = parseInt(request.params.id);
   
+    const noteIndex = notes.findIndex(note => note.id === noteId);
+  
+    if (noteIndex < 0) {
+      return response.status(404).send({ error: 'Recado não encontrado.' });
+    }
+  
+    const note = notes[noteIndex];
+  
+    if (note.userId !== userId) {
+      return response.status(403).send({ error: 'Usuário não autorizado.' });
+    }
+  
+    const updatedNote = { ...note, title, description };
+  
+    notes[noteIndex] = updatedNote;
+  
+    return response.send({ note: updatedNote });
+  });
+    
   
