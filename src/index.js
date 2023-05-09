@@ -1,4 +1,5 @@
 import express from 'express';
+import bcrypt from 'bcrypt';
 
 const app = express();
 
@@ -15,9 +16,10 @@ app.listen(8080, () => console.log("Servidor iniciado"));
 const users = [];
 const notes = [];
 
-// Rota de Criação de Conta
+import bcrypt from 'bcrypt';
 
-app.post('/signup', (request, response) => {
+//Rota de Criação de Conta
+app.post('/signup', async (request, response) => {
   const { name, email, password } = request.body;
 
   if (!name || !email || !password) {
@@ -30,7 +32,10 @@ app.post('/signup', (request, response) => {
     return response.status(400).send({ error: 'Um usuário com este email já foi cadastrado.' });
   }
 
-  const user = { id: users.length + 1, name, email, password };
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+  const user = { id: users.length + 1, name, email, password: hashedPassword };
 
   users.push(user);
 
@@ -38,21 +43,30 @@ app.post('/signup', (request, response) => {
 });
 
 // Rota de Login
-
-app.post('/login', (request, response) => {
+app.post('/login', async (request, response) => {
   const { email, password } = request.body;
 
   if (!email || !password) {
     return response.status(400).send({ error: 'Email e senha são obrigatórios.' });
   }
 
-  const user = users.find(user => user.email === email && user.password === password);
+  const user = users.find(user => user.email === email);
 
   if (!user) {
     return response.status(401).send({ error: 'Email ou senha incorretos.' });
   }
 
-  return response.send({ user });
+  try {
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return response.status(401).send({ error: 'Email ou senha incorretos.' });
+    }
+
+    return response.send({ user });
+  } catch (error) {
+    return response.status(500).send({ error: 'Erro ao fazer login.' });
+  }
 });
 
 // Rota Para Criar Recados
@@ -95,7 +109,6 @@ app.get('/notes/:id', (request, response) => {
 
 app.put('/notes/:id', (request, response) => {
   const { title, description } = request.body;
-  const userId = request.headers.authorization;
   const noteId = parseInt(request.params.id);
 
   const noteIndex = notes.findIndex(note => note.id === noteId);
@@ -105,11 +118,6 @@ app.put('/notes/:id', (request, response) => {
   }
 
   const note = notes[noteIndex];
-
-  if (note.id !== userId) {
-    return response.status(403).send({ error: 'Usuário não autorizado.' });
-  }
-
   const updatedNote = { ...note, title, description };
 
   notes[noteIndex] = updatedNote;
@@ -127,5 +135,5 @@ app.delete('/notes/:id', (request, response) => {
 
   notes.splice(noteIndex, 1);
 
-  return response.status(204).send();
+  return response.status(204).send('Recado deletado com sucesso.');
 });
