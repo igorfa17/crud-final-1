@@ -135,5 +135,5 @@ app.delete('/notes/:id', (request, response) => {
 
   notes.splice(noteIndex, 1);
 
-  return response.status(204).send('Recado deletado com sucesso.');
+  return response.status(204).send();
 });
