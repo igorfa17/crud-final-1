@@ -56,13 +56,13 @@ app.post('/login', (request, response) => {
   
   //Rota Para Criar Recados
   app.post('/notes', (request, response) => {
-    const { title, description, userId } = request.body;
+    const { title, description, id } = request.body;
   
-    if (!title || !description || !userId) {
+    if (!title || !description || !id) {
       return response.status(400).send({ error: 'Título, descrição e identificador do usuário são obrigatórios' });
     }
   
-    const note = { id: notes.length + 1, title, description, userId };
+    const note = { id: notes.length + 1, title, description, id };
   
     notes.push(note);
   
@@ -114,5 +114,23 @@ app.post('/login', (request, response) => {
   
     return response.send({ note: updatedNote });
   });
+
+  app.delete('/notes/:id', (request, response) => {
+    const { userId } = request.body;
+    const noteId = parseInt(request.params.id);
+    
+    const userNotes = notes[userId] || [];
+    const noteIndex = userNotes.findIndex(note => note.id === noteId);
+    
+    if (noteIndex < 0) {
+      return response.status(404).send({ error: 'Recado não encontrado' });
+    }
+    
+    userNotes.splice(noteIndex, 1);
+    notes[userId] = userNotes;
+    
+    return response.status(204).send();
+  });
+  
     
   
